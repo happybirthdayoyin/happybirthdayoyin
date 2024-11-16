@@ -6,11 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let analyser;
   let microphone;
 
+  // Ensure playSong is called only on user interaction
   function playSong() {
     const audio = document.getElementById('birthdaySong'); 
     audio.play(); 
   }
 
+  // Ensure playCheersSound is called only on user interaction
   function playCheersSound() {
     const cheersSound = document.getElementById('cheersSound');
     cheersSound.play();
@@ -134,23 +136,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(function (stream) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        microphone = audioContext.createMediaStreamSource(stream);
-        microphone.connect(analyser);
-        analyser.fftSize = 256;
-        setInterval(blowOutCandles, 200);
-        playSong(); // Call the playSong function here
-        createInitialCandles(); // Add initial candles on page load
-      })
-      .catch(function (err) {
-        console.log("Unable to access microphone: " + err);
-      });
-  } else {
-    console.log("getUserMedia not supported on your browser!");
-  }
+  // Use click event to initiate audio on user interaction
+  document.body.addEventListener("click", function() {
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(function (stream) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          microphone = audioContext.createMediaStreamSource(stream);
+          microphone.connect(analyser);
+          analyser.fftSize = 256;
+          setInterval(blowOutCandles, 200);
+          playSong(); // Call the playSong function here
+          createInitialCandles(); // Add initial candles on page load
+        })
+        .catch(function (err) {
+          console.log("Unable to access microphone: " + err);
+        });
+    } else {
+      console.log("getUserMedia not supported on your browser!");
+    }
+  }, { once: true }); // Add event listener only once
+
 });
