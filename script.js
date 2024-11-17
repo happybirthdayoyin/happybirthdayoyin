@@ -95,24 +95,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     analyser.getByteFrequencyData(dataArray);
-
+  
     let sum = 0;
     for (let i = 0; i < bufferLength; i++) {
       sum += dataArray[i];
     }
     let average = sum / bufferLength;
-
-    if (average > 60) { // Increase the threshold
+  
+    // Lower threshold for easier detection
+    if (average > 40) { // Was 60, now more sensitive
       blowingDetectionCount++;
-      if (blowingDetectionCount >= blowingThreshold) {
+      if (blowingDetectionCount >= 3) { // Was 5, now fewer detections required
         blowingDetectionCount = 0; // Reset the counter
         return true;
       }
     } else {
-      blowingDetectionCount = 0; // Reset if the blowing is not sustained
+      blowingDetectionCount = 0; // Reset if blowing is not sustained
     }
     return false;
   }
+  
 
   function blowOutCandles() {
     let blownOut = 0;
