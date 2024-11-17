@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     let average = sum / bufferLength;
 
-    if (average > 80) { // Increase the threshold
+    if (average > 60) { // Increase the threshold
       blowingDetectionCount++;
       if (blowingDetectionCount >= blowingThreshold) {
         blowingDetectionCount = 0; // Reset the counter
