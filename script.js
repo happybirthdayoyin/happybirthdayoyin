@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   let blowingDetectionCount = 0;
-  const blowingThreshold = 20; // Number of detections needed to blow out a candle
+  const blowingThreshold = 5; // Number of detections needed to blow out a candle
 
   function isBlowing() {
     const bufferLength = analyser.frequencyBinCount;
