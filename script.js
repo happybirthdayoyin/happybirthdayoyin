@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function playCheersSound() {
     const cheersSound = document.getElementById('cheersSound');
+    cheersSound.pause(); // Ensure any previous playback is stopped
+    cheersSound.currentTime = 0; // Reset the sound to the start
     cheersSound.play().catch(error => console.log('Error playing cheers sound:', error));
   }
 
@@ -150,7 +152,6 @@ document.addEventListener("DOMContentLoaded", function () {
           microphone.connect(analyser);
           analyser.fftSize = 256;
           setInterval(blowOutCandles, 200);
-          createInitialCandles(); // Add initial candles on page load
         })
         .catch(function (err) {
           console.log("Unable to access microphone: " + err);
@@ -158,7 +159,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }, { once: true }); // Ensure this runs only once
   }
 
-  // Start the application
+  // Place candles on load
+  createInitialCandles();
+
+  // Request microphone input
   requestMicrophone();
 
   // Play song on user interaction
