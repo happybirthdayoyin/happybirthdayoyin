@@ -7,14 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
   let microphone;
 
   function playSong() {
-    const audio = document.getElementById('birthdaySong');
-    audio.play().catch(error => console.log('Error playing birthday song:', error));
+    const audio = document.getElementById('birthdaySong'); 
+    audio.play().catch(error => console.log('Error playing birthday song:', error)); 
   }
 
   function playCheersSound() {
     const cheersSound = document.getElementById('cheersSound');
-    cheersSound.pause(); // Ensure any previous playback is stopped
-    cheersSound.currentTime = 0; // Reset the sound to the start
     cheersSound.play().catch(error => console.log('Error playing cheers sound:', error));
   }
 
@@ -40,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (Date.now() < end) {
         requestAnimationFrame(frame);
       }
-    })();
+    }());
   }
 
   // Function to update the displayed message
@@ -50,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ).length;
     if (activeCandles === 0) {
       const audio = document.getElementById('birthdaySong');
-      audio.pause(); // Stop the music
+      audio.pause();  // Stop the music
       candleCountDisplay.textContent = "Good job baby! 🎂";
       showConfetti(); // Trigger confetti
       playCheersSound(); // Play cheers sound
@@ -76,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const topLayer = document.querySelector('.layer-top');
     const topLayerRect = topLayer.getBoundingClientRect();
     const cakeRect = cake.getBoundingClientRect();
-
+    
     for (let i = 0; i < 20; i++) {
       const left = Math.random() * (topLayerRect.width - 20);
       const top = (topLayerRect.top - cakeRect.top) + Math.random() * (topLayerRect.height - 40);
@@ -90,9 +88,9 @@ document.addEventListener("DOMContentLoaded", function () {
     event.stopPropagation();
   });
 
-  // Adjusted isBlowing function to make it more difficult to blow out candles
+  // Adjusted isBlowing function to make it more sensitive and reliable
   let blowingDetectionCount = 0;
-  const blowingThreshold = 5; // Number of detections needed to blow out a candle
+  const blowingThreshold = 3; // Lowered the threshold to make it more responsive
 
   function isBlowing() {
     const bufferLength = analyser.frequencyBinCount;
@@ -105,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     let average = sum / bufferLength;
 
-    if (average > 60) { // Increase the threshold
+    if (average > 50) { // Lowered the threshold for detection
       blowingDetectionCount++;
       if (blowingDetectionCount >= blowingThreshold) {
         blowingDetectionCount = 0; // Reset the counter
@@ -122,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (isBlowing()) {
       candles.forEach((candle) => {
-        if (!candle.classList.contains("out") && Math.random() > 0.5) {
+        if (!candle.classList.contains("out")) {
           candle.classList.add("out");
           blownOut++;
         }
@@ -134,39 +132,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Request microphone permission and handle audio context initialization
+  // Request microphone permission separately
   function requestMicrophone() {
-    document.body.addEventListener("click", function () {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioContext.state === "suspended") {
-        audioContext.resume();
-      }
-
+    if (navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then(function (stream) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
           analyser = audioContext.createAnalyser();
           microphone = audioContext.createMediaStreamSource(stream);
           microphone.connect(analyser);
           analyser.fftSize = 256;
           setInterval(blowOutCandles, 200);
+          createInitialCandles(); // Add initial candles on page load
         })
         .catch(function (err) {
           console.log("Unable to access microphone: " + err);
         });
-    }, { once: true }); // Ensure this runs only once
+    } else {
+      console.log("getUserMedia not supported on your browser!");
+    }
   }
 
-  // Place candles on load
-  createInitialCandles();
-
-  // Request microphone input
+  // Request microphone access when the page loads
   requestMicrophone();
 
   // Play song on user interaction
-  document.body.addEventListener("click", function () {
+  document.body.addEventListener("click", function() {
     playSong(); // Call the playSong function here
   });
 });
