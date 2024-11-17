@@ -109,9 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
         blowingDetectionCount = 0; // Reset the counter
         return true;
       }
-    } else {
-      blowingDetectionCount = 0; // Reset if blowing is not sustained
-    }
+    } 
     return false;
   }
   
