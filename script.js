@@ -8,12 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function playSong() {
     const audio = document.getElementById('birthdaySong'); 
-    audio.play(); 
+    audio.play().catch(error => console.log('Error playing birthday song:', error)); 
   }
 
   function playCheersSound() {
     const cheersSound = document.getElementById('cheersSound');
-    cheersSound.play();
+    cheersSound.play().catch(error => console.log('Error playing cheers sound:', error));
   }
 
   // Function to show confetti
@@ -52,8 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
       candleCountDisplay.textContent = "Good job baby! 🎂";
       showConfetti(); // Trigger confetti
       playCheersSound(); // Play cheers sound
-    } else {
-      candleCountDisplay.textContent = `Happy 20th Birthday Princess Oyin❤️`;
     }
   }
 
@@ -134,23 +132,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(function (stream) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        microphone = audioContext.createMediaStreamSource(stream);
-        microphone.connect(analyser);
-        analyser.fftSize = 256;
-        setInterval(blowOutCandles, 200);
-        playSong(); // Call the playSong function here
-        createInitialCandles(); // Add initial candles on page load
-      })
-      .catch(function (err) {
-        console.log("Unable to access microphone: " + err);
-      });
-  } else {
-    console.log("getUserMedia not supported on your browser!");
+  // Request microphone permission separately
+  function requestMicrophone() {
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(function (stream) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          microphone = audioContext.createMediaStreamSource(stream);
+          microphone.connect(analyser);
+          analyser.fftSize = 256;
+          setInterval(blowOutCandles, 200);
+          createInitialCandles(); // Add initial candles on page load
+        })
+        .catch(function (err) {
+          console.log("Unable to access microphone: " + err);
+        });
+    } else {
+      console.log("getUserMedia not supported on your browser!");
+    }
   }
+
+  // Request microphone access when the page loads
+  requestMicrophone();
+
+  // Play song on user interaction
+  document.body.addEventListener("click", function() {
+    playSong(); // Call the playSong function here
+  });
 });
