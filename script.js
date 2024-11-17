@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let microphone;
 
   function playSong() {
-    const audio = document.getElementById('birthdaySong'); 
-    audio.play().catch(error => console.log('Error playing birthday song:', error)); 
+    const audio = document.getElementById('birthdaySong');
+    audio.play().catch(error => console.log('Error playing birthday song:', error));
   }
 
   function playCheersSound() {
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (Date.now() < end) {
         requestAnimationFrame(frame);
       }
-    }());
+    })();
   }
 
   // Function to update the displayed message
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ).length;
     if (activeCandles === 0) {
       const audio = document.getElementById('birthdaySong');
-      audio.pause();  // Stop the music
+      audio.pause(); // Stop the music
       candleCountDisplay.textContent = "Good job baby! 🎂";
       showConfetti(); // Trigger confetti
       playCheersSound(); // Play cheers sound
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const topLayer = document.querySelector('.layer-top');
     const topLayerRect = topLayer.getBoundingClientRect();
     const cakeRect = cake.getBoundingClientRect();
-    
+
     for (let i = 0; i < 20; i++) {
       const left = Math.random() * (topLayerRect.width - 20);
       const top = (topLayerRect.top - cakeRect.top) + Math.random() * (topLayerRect.height - 40);
@@ -132,13 +132,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Request microphone permission separately
+  // Request microphone permission and handle audio context initialization
   function requestMicrophone() {
-    if (navigator.mediaDevices.getUserMedia) {
+    document.body.addEventListener("click", function () {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then(function (stream) {
-          audioContext = new (window.AudioContext || window.webkitAudioContext)();
           analyser = audioContext.createAnalyser();
           microphone = audioContext.createMediaStreamSource(stream);
           microphone.connect(analyser);
@@ -149,16 +155,14 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(function (err) {
           console.log("Unable to access microphone: " + err);
         });
-    } else {
-      console.log("getUserMedia not supported on your browser!");
-    }
+    }, { once: true }); // Ensure this runs only once
   }
 
-  // Request microphone access when the page loads
+  // Start the application
   requestMicrophone();
 
   // Play song on user interaction
-  document.body.addEventListener("click", function() {
+  document.body.addEventListener("click", function () {
     playSong(); // Call the playSong function here
   });
 });
